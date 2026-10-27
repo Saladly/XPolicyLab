@@ -45,8 +45,9 @@ Account pool (agp_core/accounts.py): right before codex starts the launcher leas
 AGP_HOME/private/accounts a login of the least used account (up to episodes_per_login episodes share one login while its
 access token outlives this launcher's codex limit and deploy.yml agp.episode_timeout_s by an hour; closer to its expiry
 it is leased exclusively, or first renewed with this launcher's codex when no episode holds it), else
-~/.codex/auth.json -- and copies it into the episode's CODEX_HOME. No usable slot: the launcher exits before codex
-starts (policy_finished.json `account_error`, an infrastructure failure the launcher re-runs; nothing waits). In
+~/.codex/auth.json -- and copies it into the episode's CODEX_HOME. No usable slot (every login leased exclusively near
+its access expiry, cooling or at its usage cap): the launcher tries again every ACCOUNT_RETRY_S for up to ACCOUNT_WAIT_S,
+then exits before codex starts (policy_finished.json `account_error`, an infrastructure failure the launcher re-runs). In
 `finally`, once codex is gone: a login codex renewed during the episode is written back (atomically, only a valid,
 newer copy of the same login and session, never over a newer slot file), the copy and the lease are deleted, the
 rollout's last usage reading and a codex failure (usage limit, refresh/401, 429) are recorded for the account.
@@ -72,6 +73,9 @@ MODEL = os.environ.get("OURS_MODEL", "gpt-6-astra")
 EFFORT = os.environ.get("OURS_EFFORT", "medium")
 TIER = os.environ.get("OURS_SERVICE_TIER", "default")
 TIMEOUT_S = float(os.environ.get("OURS_POLICY_TIMEOUT_S", "14000"))
+# no usable account slot: try again every ACCOUNT_RETRY_S for up to ACCOUNT_WAIT_S before failing the episode
+ACCOUNT_WAIT_S = float(os.environ.get("AGP_ACCOUNT_WAIT_S", "3600"))
+ACCOUNT_RETRY_S = float(os.environ.get("AGP_ACCOUNT_RETRY_S", "30"))
 TOOLS = ("goal", "observe", "measure", "step", "run", "action_status", "assess")
 AGENT_PYTHON = paths.AGP_HOME / ".venv-agent" / "bin" / "python"
 # One HTTP server process per episode. hybrid: registered twice, "robot" for direct tool calls and
@@ -327,12 +331,20 @@ def on_sigterm(signum, frame):
 
 signal.signal(signal.SIGTERM, on_sigterm)
 try:
-    try:
-        LEASE = accounts.lease(paths.AGP_HOME, codex_state / "auth.json", owner=str(session), episode_s=TIMEOUT_S,
-                               codex=CODEX)
-    except accounts.NoAccount as exc:
-        ACCOUNT["account_error"] = f"no usable codex account slot: {exc}"
-        raise SystemExit(f"[AGP account] {ACCOUNT['account_error']}") from None
+    wait_until = time.monotonic() + ACCOUNT_WAIT_S
+    reported = 0.0
+    while LEASE is None:
+        try:
+            LEASE = accounts.lease(paths.AGP_HOME, codex_state / "auth.json", owner=str(session), episode_s=TIMEOUT_S,
+                                   codex=CODEX)
+        except accounts.NoAccount as exc:
+            if time.monotonic() >= wait_until:
+                ACCOUNT["account_error"] = f"no usable codex account slot: {exc}"
+                raise SystemExit(f"[AGP account] {ACCOUNT['account_error']}") from None
+            if time.monotonic() - reported >= 300:
+                print(f"[AGP account] no usable slot yet, trying again every {ACCOUNT_RETRY_S:.0f} s: {exc}", flush=True)
+                reported = time.monotonic()
+            time.sleep(ACCOUNT_RETRY_S)
     if LEASE.get("source") == "pool":
         print(f"[AGP account] slot {LEASE.get('label')}, account {LEASE.get('account_hash')}, "
               f"{LEASE.get('used_percent_at_select', 0):.0f}% of its window used", flush=True)

@@ -117,8 +117,8 @@ XPolicyLab/policy/AGP/agp_runtime that deploy.yml agp.runtime_root names (load_c
 policy folder, and AGP_HOME inside the checkout); the policy's interpreter, its TMPDIR, the sessions and codex's homes
 are in AGP_HOME (agp_core/paths.py), which the policy process gets explicitly. Nothing is written into the policy folder.
 
-Account pool (agp_core/accounts.py, leased by agp_core/run_agent.py): a launcher that finds no usable slot exits before codex
-starts with policy_finished.json `account_error` (an infrastructure failure naming the accounts' use and reset times);
+Account pool (agp_core/accounts.py, leased by agp_core/run_agent.py): a launcher that finds no usable slot within its wait
+exits before codex starts with policy_finished.json `account_error` (an infrastructure failure naming the accounts' use and reset times);
 codex's own refresh / sign-in, credit and spend-cap failures count as provider errors (PROVIDER_ERROR).
 episode_metrics.json `account` copies launch.json `account` and policy_finished.json `account_end` (labels, hashes, use,
 write-back; never a credential); episode.json freeze.not_frozen `account_pool` is the pool summary (credentials stay

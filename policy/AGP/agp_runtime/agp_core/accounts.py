@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Codex account pool: one ChatGPT login per slot, up to episodes_per_login (default 3) episodes per login at a time.
+"""Codex account pool: one ChatGPT login per slot, any number of episodes per login at a time (pool.json
+episodes_per_login can set a limit).
 
 The RoboDojo committee runs the benchmark with model access we provide: several dedicated ChatGPT accounts, each
 logged in once per slot with the pinned codex, whose login files are placed under AGP_HOME. agp_core/run_agent.py leases a
@@ -45,8 +46,8 @@ Layout (AGP_HOME/private/accounts, 0700; `private` is runtime state for agp_core
     staging/<label>/         where a login is made before `add`
     tmp/                     temporary CODEX_HOMEs of refresh / ratelimits and of the renewal before a lease
 
-Sharing a login: up to episodes_per_login episodes (pool.json, default EPISODES_PER_LOGIN = 3) hold copies of one
-login at the same time, so the pool runs at most (logins x episodes_per_login) episodes; an account still has at most
+Sharing a login: up to episodes_per_login episodes (pool.json; the default EPISODES_PER_LOGIN sets no practical limit)
+hold copies of one login at the same time, so the pool runs at most (logins x episodes_per_login) episodes; an account still has at most
 MAX_SLOTS_PER_ACCOUNT slots. codex renews a login only 5 minutes before its access token expires (or after a 401), and
 a renewal rotates the refresh token, which the other copies of the login then hold used. So a login is shared only while
 its access token stays valid longer than the longest episode (deploy.yml agp.episode_timeout_s of the policy folder, or
@@ -99,7 +100,7 @@ import time
 
 FORMAT = "agp-accounts/1"
 MAX_SLOTS_PER_ACCOUNT = 3
-EPISODES_PER_LOGIN = 3           # default of pool.json episodes_per_login: episodes sharing one login at a time
+EPISODES_PER_LOGIN = 1000        # default of pool.json episodes_per_login: no practical limit on episodes sharing a login
 SHARE_MARGIN_S = 3600.0          # a login is shared only while its access token outlives the longest episode by this
 DEFAULT_EPISODE_S = 14400.0      # the longest episode when deploy.yml agp.episode_timeout_s cannot be read
 RENEW_TIMEOUT_S = 90.0           # the renewal before a lease (codex app-server), under the pool lock

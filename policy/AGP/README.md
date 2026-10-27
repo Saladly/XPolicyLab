@@ -76,7 +76,7 @@ mkdir -p -m 700 ~/.agp-robodojo/private
 tar -xzf agp_accounts.tar.gz -C ~/.agp-robodojo/private    # creates private/accounts/
 ```
 
-Every episode takes one of its logins; the accounts we provide support at most 12 simulators running at the same time. Without the pool folder, every episode uses the login in `~/.codex/auth.json`.
+Every episode takes one of its logins; the logins are shared, so there is no limit on the number of simulators running at the same time. Without the pool folder, every episode uses the login in `~/.codex/auth.json`.
 
 ## Configuration
 
