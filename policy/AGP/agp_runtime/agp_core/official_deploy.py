@@ -188,7 +188,7 @@ AUTO_UPDATED_CODEX = ("/standalone/current/", "/.local/bin/codex")
 PROVIDER_ERROR = re.compile(
     r"\b(401|403|429|500|502|503|504)\b|unauthori[sz]ed|authenticat|forbidden|rate.?limit|quota|usage.?limit|"
     r"api.?key|stream (?:error|disconnected)|connection (?:refused|reset|error|closed)|network|"
-    r"service unavailable|overloaded|"
+    r"service unavailable|overloaded|at capacity|"
     # codex's login renewal failing ("Your access token could not be refreshed ... Please log out and sign in again.",
     # a revoked login), and workspace credit / spend-cap ends (account pool)
     r"could not be refreshed|sign in again|invalidated oauth|out of credits|spend cap", re.I)
