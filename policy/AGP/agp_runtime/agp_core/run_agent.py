@@ -18,7 +18,7 @@ With OURS_RGB_ONLY off none of this applies.
 Task notes (OURS_TASK_NOTES, opt-in): the launch message gets, right after the rendered main prompt and before the
 preload's episode part, the note of the episode's official task (agp_core/task_notes.py; launch.json `task_note`). Without a
 readable task name in the session's episode.json the launcher refuses to start. Off: nothing of it runs.
-Task hints (OURS_TASK_HINTS, opt-in): the hint for the episode's official task (agp_core/task_hints.json: a hint for 22
+Task hints (OURS_TASK_HINTS, opt-in): the hint for the episode's official task (agp_core/task_hints.json: a hint for 18
 tasks, a layer separate from the notes) follows as its own section right after the notes section (right after the
 main prompt when the notes are off), before the preload's episode part (agp_core/task_notes.py launch_hint_section;
 launch.json `task_hint`). Without a readable task name the launcher refuses to start. Off: nothing of it runs.

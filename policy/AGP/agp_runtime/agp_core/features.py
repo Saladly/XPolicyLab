@@ -151,7 +151,7 @@ FLAGS = {
     "task_notes": "OURS_TASK_NOTES",          # the launcher appends, right after the rendered main prompt, the note of
                                               # the episode's official task (TASK_ENV.task_name as the adapter recorded
                                               # it in episode.json; a _random configuration gets its base task's note)
-    # Task hints (agp_core/task_hints.json, agp_core/task_notes.py, agp_core/run_agent.py): a hint for 22 tasks, a layer
+    # Task hints (agp_core/task_hints.json, agp_core/task_notes.py, agp_core/run_agent.py): a hint for 18 tasks, a layer
     # separate from the task notes, behind its own switch. Off reproduces the pipeline above unchanged (the launcher
     # appends nothing).
     "task_hints": "OURS_TASK_HINTS",          # the launcher appends, right after the task-notes section (right after the

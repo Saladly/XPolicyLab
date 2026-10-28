@@ -18,7 +18,7 @@ is a geometric fact about an object). A _random configuration gets its base task
 section.
 
 Task hints: the notes hold only the official scoring requirements; the hints are a separate layer behind their own
-opt-in switch OURS_TASK_HINTS. They live in agp_core/task_hints.json (`hints`: a hint for 22 tasks, one entry per base task,
+opt-in switch OURS_TASK_HINTS. They live in agp_core/task_hints.json (`hints`: a hint for 18 tasks, one entry per base task,
 appended verbatim; a _random configuration gets its base task's hint, a task without an entry gets no section). With
 the switch on, agp_core/run_agent.py appends hint_section(task) (heading HINT_HEADING) right after the notes section (right
 after the main prompt when OURS_TASK_NOTES is off) and records launch_hint_section's record in launch.json `task_hint`.
